@@ -1,0 +1,242 @@
+{
+  "animals": [
+    {
+      "word": "Dog",
+      "hints": ["Pet", "Barks", "Four legs", "Man's best friend", "Wags tail"]
+    },
+    {
+      "word": "Cat",
+      "hints": ["Pet", "Meows", "Independent", "Likes fish", "Purrs"]
+    },
+    {
+      "word": "Elephant",
+      "hints": ["Large animal", "Has trunk", "Gray color", "Lives in Africa", "Very intelligent"]
+    },
+    {
+      "word": "Lion",
+      "hints": ["Wild cat", "King of jungle", "Mane", "Roars", "Carnivore"]
+    },
+    {
+      "word": "Penguin",
+      "hints": ["Bird", "Black and white", "Can't fly", "Lives in Antarctica", "Waddles"]
+    },
+    {
+      "word": "Dolphin",
+      "hints": ["Sea creature", "Intelligent", "Echolocation", "Jumps out of water", "Social animal"]
+    },
+    {
+      "word": "Tiger",
+      "hints": ["Wild cat", "Stripes", "Orange color", "Solitary", "Endangered"]
+    },
+    {
+      "word": "Giraffe",
+      "hints": ["Tall animal", "Long neck", "Spots", "Herbivore", "African animal"]
+    },
+    {
+      "word": "Zebra",
+      "hints": ["Striped animal", "Black and white", "Horse-like", "African", "Herbivore"]
+    },
+    {
+      "word": "Koala",
+      "hints": ["Tree animal", "Eats eucalyptus", "Australian", "Sleeps a lot", "Gray and fluffy"]
+    }
+  ],
+  "food": [
+    {
+      "word": "Pizza",
+      "hints": ["Italian food", "Round shape", "Has cheese", "Baked in oven", "Popular fast food"]
+    },
+    {
+      "word": "Burger",
+      "hints": ["Fast food", "Has bun", "Meat patty", "American food", "Can have toppings"]
+    },
+    {
+      "word": "Sushi",
+      "hints": ["Japanese food", "Raw fish", "Rice", "Seaweed", "Artistic presentation"]
+    },
+    {
+      "word": "Pasta",
+      "hints": ["Italian food", "Made from wheat", "Various shapes", "Sauce", "Boiled"]
+    },
+    {
+      "word": "Tacos",
+      "hints": ["Mexican food", "Tortilla", "Can be spicy", "Various fillings", "Hand-held"]
+    },
+    {
+      "word": "Ice Cream",
+      "hints": ["Frozen dessert", "Sweet", "Various flavors", "Cold", "Creamy"]
+    },
+    {
+      "word": "Coffee",
+      "hints": ["Hot drink", "Caffeine", "Bitter", "Morning drink", "Can be black or with milk"]
+    },
+    {
+      "word": "Chocolate",
+      "hints": ["Sweet treat", "Brown color", "Made from cocoa", "Can be dark or milk", "Popular dessert"]
+    },
+    {
+      "word": "Apple",
+      "hints": ["Fruit", "Red or green", "Grows on trees", "Healthy snack", "Crispy"]
+    },
+    {
+      "word": "Sandwich",
+      "hints": ["Bread food", "Has filling", "Lunch food", "Can be hot or cold", "Portable"]
+    }
+  ],
+  "places": [
+    {
+      "word": "Beach",
+      "hints": ["Water location", "Sand", "Ocean waves", "Sunny", "Vacation spot"]
+    },
+    {
+      "word": "Mountain",
+      "hints": ["High place", "Rocky", "Snow on top", "Hiking", "Beautiful view"]
+    },
+    {
+      "word": "Library",
+      "hints": ["Quiet place", "Books", "Study", "Silent", "Knowledge"]
+    },
+    {
+      "word": "Restaurant",
+      "hints": ["Eating place", "Food service", "Tables", "Menu", "Chef"]
+    },
+    {
+      "word": "Park",
+      "hints": ["Outdoor space", "Green grass", "Trees", "Playground", "Fresh air"]
+    },
+    {
+      "word": "Museum",
+      "hints": ["Cultural place", "Art", "History", "Educational", "Exhibits"]
+    },
+    {
+      "word": "Cinema",
+      "hints": ["Entertainment venue", "Movies", "Dark room", "Popcorn", "Big screen"]
+    },
+    {
+      "word": "Hospital",
+      "hints": ["Medical place", "Doctors", "Patients", "Emergency", "Health care"]
+    },
+    {
+      "word": "School",
+      "hints": ["Learning place", "Students", "Teachers", "Education", "Classrooms"]
+    },
+    {
+      "word": "Airport",
+      "hints": ["Travel hub", "Planes", "Passengers", "Security", "Departures"]
+    }
+  ],
+  "movies": [
+    {
+      "word": "Star Wars",
+      "hints": ["Space franchise", "Lightsabers", "Force", "Darth Vader", "Galaxy far away"]
+    },
+    {
+      "word": "Harry Potter",
+      "hints": ["Magic series", "Wizard", "Hogwarts", "Spells", "Boy who lived"]
+    },
+    {
+      "word": "Marvel",
+      "hints": ["Superhero universe", "Avengers", "Comic books", "Superpowers", "MCU"]
+    },
+    {
+      "word": "Disney",
+      "hints": ["Animation studio", "Mickey Mouse", "Princesses", "Family movies", "Magic kingdom"]
+    },
+    {
+      "word": "Titanic",
+      "hints": ["Ship movie", "Romance", "Iceberg", "Leonardo DiCaprio", "Historical"]
+    },
+    {
+      "word": "Inception",
+      "hints": ["Dream movie", "Christopher Nolan", "Layers", "Reality", "Mind-bending"]
+    },
+    {
+      "word": "Avatar",
+      "hints": ["Blue aliens", "Pandora", "3D movie", "James Cameron", "Sci-fi"]
+    },
+    {
+      "word": "Jurassic Park",
+      "hints": ["Dinosaur movie", "Steven Spielberg", "Island", "T-Rex", "DNA"]
+    }
+  ],
+  "objects": [
+    {
+      "word": "Phone",
+      "hints": ["Communication device", "Calls", "Apps", "Touch screen", "Portable"]
+    },
+    {
+      "word": "Lamp",
+      "hints": ["Light source", "Electric", "Table or floor", "Bulb", "Illumination"]
+    },
+    {
+      "word": "Chair",
+      "hints": ["Furniture", "Sitting", "Four legs", "Backrest", "Wood or metal"]
+    },
+    {
+      "word": "Clock",
+      "hints": ["Time device", "Hands", "Numbers", "Tick tock", "Wall or table"]
+    },
+    {
+      "word": "Mirror",
+      "hints": ["Reflection", "Glass", "Bathroom", "See yourself", "Shiny surface"]
+    },
+    {
+      "word": "Umbrella",
+      "hints": ["Rain tool", "Waterproof", "Handle", "Opens up", "Protection"]
+    },
+    {
+      "word": "Wallet",
+      "hints": ["Money holder", "Leather", "Cards", "Pocket", "Personal items"]
+    },
+    {
+      "word": "Keys",
+      "hints": ["Door opener", "Metal", "Ring", "Locks", "Small"]
+    },
+    {
+      "word": "Pencil",
+      "hints": ["Writing tool", "Graphite", "Eraser", "Wood", "Sharpening"]
+    },
+    {
+      "word": "Book",
+      "hints": ["Reading material", "Pages", "Cover", "Story", "Knowledge"]
+    }
+  ],
+  "sports": [
+    {
+      "word": "Soccer",
+      "hints": ["Ball sport", "Football", "Goal", "Kicking", "World Cup"]
+    },
+    {
+      "word": "Basketball",
+      "hints": ["Hoop game", "Bouncing", "NBA", "Court", "Dribbling"]
+    },
+    {
+      "word": "Tennis",
+      "hints": ["Racket sport", "Net", "Wimbledon", "Serve", "Court"]
+    },
+    {
+      "word": "Swimming",
+      "hints": ["Water activity", "Pool", "Laps", "Stroke", "Olympic sport"]
+    },
+    {
+      "word": "Baseball",
+      "hints": ["Bat sport", "Diamond", "Home run", "Pitcher", "American pastime"]
+    },
+    {
+      "word": "Golf",
+      "hints": ["Club game", "Hole", "Green", "Par", "Tee"]
+    },
+    {
+      "word": "Skiing",
+      "hints": ["Snow sport", "Slopes", "Poles", "Winter", "Mountain"]
+    },
+    {
+      "word": "Boxing",
+      "hints": ["Fighting sport", "Gloves", "Ring", "Punches", "Rounds"]
+    },
+    {
+      "word": "Cycling",
+      "hints": ["Bike activity", "Pedals", "Tour de France", "Wheels", "Exercise"]
+    }
+  ]
+}
