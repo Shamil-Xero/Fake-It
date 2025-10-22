@@ -116,10 +116,11 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
+        padding: 10px 15px;
         background: white;
         margin-bottom: 8px;
         border-radius: 6px;
+        border-left: 4px solid;
     }
 
     .remove-btn {
@@ -194,21 +195,23 @@
     .vote-btn {
         padding: 15px;
         background: white;
-        border: 2px solid #667eea;
-        color: #667eea;
+        color: #333;
+        border: 3px solid;
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s;
+        font-weight: 600;
+        font-size: 16px;
     }
 
     .vote-btn:hover {
-        background: #667eea;
-        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .vote-btn.selected {
-        background: #667eea;
-        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
     }
 
     .results-box {
@@ -224,12 +227,13 @@
     }
 
     .vote-count {
-        padding: 10px;
+        padding: 10px 15px;
         background: white;
         margin-bottom: 8px;
         border-radius: 6px;
         display: flex;
         justify-content: space-between;
+        border-left: 4px solid;
     }
 
     .winner {
@@ -247,6 +251,99 @@
         color: #999;
         font-size: 0.9em;
         margin-top: 10px;
+    }
+
+    .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #667eea;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .category-checkboxes {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: auto;
+        cursor: pointer;
+    }
+
+    .round-counter {
+        background: #667eea;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .game-info {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #ffc107;
+    }
+
+    .game-info p {
+        margin: 5px 0;
+        color: #856404;
     }
 </style>
 ```
@@ -272,6 +369,31 @@
         </div>
 
         <div class="input-group">
+            <label>Number of Imposters:</label>
+            <input type="number" id="imposterCount" min="1" max="5" value="1">
+        </div>
+
+        <div class="input-group">
+            <label>Starting Player:</label>
+            <select id="startingPlayer">
+                <option value="random">Random</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Number of Rounds:</label>
+            <input type="number" id="roundCount" min="1" max="10" value="3">
+        </div>
+
+        <div class="toggle-container">
+            <label style="margin: 0;">Multiple Categories:</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="multiCategoryToggle" onchange="toggleMultiCategory()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="input-group" id="singleCategoryGroup">
             <label>Category:</label>
             <select id="categorySelect">
                 <option value="animals">Animals</option>
@@ -283,12 +405,45 @@
             </select>
         </div>
 
+        <div class="input-group" id="multiCategoryGroup" style="display: none;">
+            <label>Select Categories:</label>
+            <div class="category-checkboxes">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_animals" value="animals">
+                    <label for="cat_animals" style="margin: 0;">Animals</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_food" value="food">
+                    <label for="cat_food" style="margin: 0;">Food & Drinks</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_places" value="places">
+                    <label for="cat_places" style="margin: 0;">Places</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_movies" value="movies">
+                    <label for="cat_movies" style="margin: 0;">Movies & TV</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_objects" value="objects">
+                    <label for="cat_objects" style="margin: 0;">Everyday Objects</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cat_sports" value="sports">
+                    <label for="cat_sports" style="margin: 0;">Sports</label>
+                </div>
+            </div>
+        </div>
+
         <button onclick="startGame()">Start Game</button>
         <p class="storage-info">✓ Player names are saved automatically</p>
     </div>
 
     <!-- Role Reveal Screen -->
     <div class="role-screen">
+        <div style="text-align: center;">
+            <span class="round-counter">Round <span id="currentRoundDisplay">1</span> / <span id="totalRoundsDisplay">3</span></span>
+        </div>
         <div class="role-reveal" id="roleReveal">
             <h2 id="playerNameDisplay"></h2>
             <div id="roleContent" class="hidden">
@@ -303,9 +458,17 @@
 
     <!-- Game Screen -->
     <div class="game-screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span class="round-counter">Round <span id="gameRoundDisplay">1</span> / <span id="gameTotalRoundsDisplay">3</span></span>
+        </div>
+        <div class="game-info">
+            <p><strong>Starting Player:</strong> <span id="startingPlayerName"></span></p>
+            <p><strong>Number of Imposters:</strong> <span id="imposterCountDisplay"></span></p>
+        </div>
         <div class="player-turn">
-            <h3>Round <span id="roundNum">1</span></h3>
+            <h3>Discussion Time</h3>
             <p>Everyone takes turns giving a clue about the secret word!</p>
+            <p style="margin-top: 10px; color: #666;">Start with <strong id="startPlayerReminder"></strong> and go clockwise.</p>
         </div>
         <button onclick="startVoting()">Start Voting</button>
     </div>
@@ -313,13 +476,16 @@
     <!-- Voting Screen -->
     <div class="voting-screen">
         <h2 style="text-align: center; margin-bottom: 20px;">Who is the Faker?</h2>
-        <p style="text-align: center; margin-bottom: 20px; color: #666;">Everyone votes for who they think is faking it!</p>
+        <p style="text-align: center; margin-bottom: 20px; color: #666;">Each player click on who you think is faking it!</p>
         <div class="voting-grid" id="votingGrid"></div>
         <button onclick="showResults()">Reveal Results</button>
     </div>
 
     <!-- Results Screen -->
     <div class="results-screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span class="round-counter">Round <span id="resultsRoundDisplay">1</span> / <span id="resultsTotalRoundsDisplay">3</span></span>
+        </div>
         <div id="winnerDisplay"></div>
         
         <div class="results-box">
@@ -333,7 +499,18 @@
             <div style="text-align: center; color: #666; margin-top: 10px;">Hint: <span id="finalHint"></span></div>
         </div>
 
-        <button onclick="resetGame()">Play Again</button>
+        <div class="results-box" id="imposterListBox">
+            <h3>The Imposters were:</h3>
+            <div id="imposterList"></div>
+        </div>
+
+        <div id="scoreBoard" class="results-box">
+            <h3>Score Board:</h3>
+            <div id="scores"></div>
+        </div>
+
+        <button onclick="nextRound()" id="nextRoundBtn">Next Round</button>
+        <button onclick="resetGame()" class="secondary-btn">New Game</button>
     </div>
 </div>
 
@@ -410,15 +587,28 @@
         ]
     };
 
+    const playerColors = [
+        '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
+        '#1abc9c', '#e67e22', '#34495e', '#16a085', '#c0392b'
+    ];
+
     let players = [];
     let currentPlayerIndex = 0;
-    let fakerIndex = -1;
+    let fakerIndices = [];
     let secretWord = '';
     let hintWord = '';
     let votes = {};
+    let currentRound = 1;
+    let totalRounds = 3;
+    let startingPlayerIndex = 0;
+    let playerWins = 0;
+    let fakerWins = 0;
 
-    // Load saved players on startup
     window.addEventListener('DOMContentLoaded', loadPlayers);
+
+    function getPlayerColor(index) {
+        return playerColors[index % playerColors.length];
+    }
 
     function loadPlayers() {
         const saved = localStorage.getItem('fakeItPlayers');
@@ -426,6 +616,7 @@
             try {
                 players = JSON.parse(saved);
                 updatePlayerList();
+                updateStartingPlayerDropdown();
             } catch (e) {
                 console.error('Error loading players:', e);
             }
@@ -449,6 +640,7 @@
             input.value = '';
             savePlayers();
             updatePlayerList();
+            updateStartingPlayerDropdown();
         }
     }
 
@@ -459,7 +651,7 @@
         if (players.length > 0) {
             list.style.display = 'block';
             playersDiv.innerHTML = players.map((p, i) => `
-                <div class="player-item">
+                <div class="player-item" style="border-left-color: ${getPlayerColor(i)};">
                     <span>${p}</span>
                     <button class="remove-btn" onclick="removePlayer(${i})">Remove</button>
                 </div>
@@ -469,10 +661,23 @@
         }
     }
 
+    function updateStartingPlayerDropdown() {
+        const dropdown = document.getElementById('startingPlayer');
+        dropdown.innerHTML = '<option value="random">Random</option>' + 
+            players.map((p, i) => `<option value="${i}">${p}</option>`).join('');
+    }
+
     function removePlayer(index) {
         players.splice(index, 1);
         savePlayers();
         updatePlayerList();
+        updateStartingPlayerDropdown();
+    }
+
+    function toggleMultiCategory() {
+        const isMulti = document.getElementById('multiCategoryToggle').checked;
+        document.getElementById('singleCategoryGroup').style.display = isMulti ? 'none' : 'block';
+        document.getElementById('multiCategoryGroup').style.display = isMulti ? 'block' : 'none';
     }
 
     function startGame() {
@@ -481,16 +686,66 @@
             return;
         }
 
-        const category = document.getElementById('categorySelect').value;
-        const wordList = words[category];
+        const imposterCount = parseInt(document.getElementById('imposterCount').value);
+        if (imposterCount >= players.length) {
+            alert('Number of imposters must be less than total players!');
+            return;
+        }
+
+        const isMultiCategory = document.getElementById('multiCategoryToggle').checked;
+        let categories = [];
+
+        if (isMultiCategory) {
+            const checkboxes = document.querySelectorAll('.category-checkboxes input[type="checkbox"]:checked');
+            categories = Array.from(checkboxes).map(cb => cb.value);
+            if (categories.length === 0) {
+                alert('Please select at least one category!');
+                return;
+            }
+        } else {
+            categories = [document.getElementById('categorySelect').value];
+        }
+
+        const selectedCategory = categories[Math.floor(Math.random() * categories.length)];
+        const wordList = words[selectedCategory];
         const selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
         secretWord = selectedWord.word;
         hintWord = selectedWord.hint;
-        fakerIndex = Math.floor(Math.random() * players.length);
+
+        fakerIndices = [];
+        while (fakerIndices.length < imposterCount) {
+            const randomIndex = Math.floor(Math.random() * players.length);
+            if (!fakerIndices.includes(randomIndex)) {
+                fakerIndices.push(randomIndex);
+            }
+        }
+
+        const startingPlayerValue = document.getElementById('startingPlayer').value;
+        if (startingPlayerValue === 'random') {
+            startingPlayerIndex = Math.floor(Math.random() * players.length);
+        } else {
+            startingPlayerIndex = parseInt(startingPlayerValue);
+        }
+
+        totalRounds = parseInt(document.getElementById('roundCount').value);
+        currentRound = 1;
+        playerWins = 0;
+        fakerWins = 0;
+
         currentPlayerIndex = 0;
 
+        updateRoundDisplays();
         showScreen('role-screen');
         showPlayerRole();
+    }
+
+    function updateRoundDisplays() {
+        document.getElementById('currentRoundDisplay').textContent = currentRound;
+        document.getElementById('totalRoundsDisplay').textContent = totalRounds;
+        document.getElementById('gameRoundDisplay').textContent = currentRound;
+        document.getElementById('gameTotalRoundsDisplay').textContent = totalRounds;
+        document.getElementById('resultsRoundDisplay').textContent = currentRound;
+        document.getElementById('resultsTotalRoundsDisplay').textContent = totalRounds;
     }
 
     function showPlayerRole() {
@@ -504,9 +759,9 @@
         playerName.textContent = players[currentPlayerIndex];
         roleContent.classList.add('hidden');
         
-        if (currentPlayerIndex === fakerIndex) {
+        if (fakerIndices.includes(currentPlayerIndex)) {
             roleReveal.classList.add('faker-reveal');
-            roleText.textContent = 'You are the FAKER!';
+            roleText.textContent = 'You are an IMPOSTER!';
             secretWordDiv.textContent = '❓';
             hintWordDiv.textContent = `Hint: ${hintWord}`;
             hintWordDiv.style.display = 'block';
@@ -532,6 +787,9 @@
         if (currentPlayerIndex < players.length) {
             showPlayerRole();
         } else {
+            document.getElementById('startingPlayerName').textContent = players[startingPlayerIndex];
+            document.getElementById('imposterCountDisplay').textContent = fakerIndices.length;
+            document.getElementById('startPlayerReminder').textContent = players[startingPlayerIndex];
             showScreen('game-screen');
         }
     }
@@ -539,7 +797,7 @@
     function startVoting() {
         const grid = document.getElementById('votingGrid');
         grid.innerHTML = players.map((p, i) => `
-            <button class="vote-btn" onclick="vote(${i})">${p}</button>
+            <button class="vote-btn" style="border-color: ${getPlayerColor(i)};" onclick="vote(${i})">${p}</button>
         `).join('');
         votes = {};
         showScreen('voting-screen');
@@ -547,12 +805,19 @@
 
     function vote(index) {
         const buttons = document.querySelectorAll('.vote-btn');
-        buttons.forEach((btn, i) => {
-            if (i === index) {
-                btn.classList.add('selected');
-                votes[players[index]] = (votes[players[index]] || 0) + 1;
+        const clickedButton = buttons[index];
+        
+        clickedButton.classList.toggle('selected');
+        
+        const playerName = players[index];
+        if (clickedButton.classList.contains('selected')) {
+            votes[playerName] = (votes[playerName] || 0) + 1;
+        } else {
+            votes[playerName] = (votes[playerName] || 1) - 1;
+            if (votes[playerName] <= 0) {
+                delete votes[playerName];
             }
-        });
+        }
     }
 
     function showResults() {
@@ -566,78 +831,120 @@
         let maxVotes = 0;
         let mostVoted = [];
 
-        for (let player in playerVotes) {
+        for (let player in votes) {
             const playerIndex = players.indexOf(player);
-            const colorClass = `player-color-${(playerIndex % 10) + 1}`;
+            const color = getPlayerColor(playerIndex);
             resultsHTML += `
-                <div class="vote-count ${colorClass}">
+                <div class="vote-count" style="border-left-color: ${color};">
                     <span>${player}</span>
-                    <span>${playerVotes[player]} vote(s)</span>
+                    <span>${votes[player]} vote(s)</span>
                 </div>
             `;
-            if (playerVotes[player] > maxVotes) {
-                maxVotes = playerVotes[player];
+            if (votes[player] > maxVotes) {
+                maxVotes = votes[player];
                 mostVoted = [player];
-            } else if (playerVotes[player] === maxVotes) {
+            } else if (votes[player] === maxVotes && maxVotes > 0) {
                 mostVoted.push(player);
             }
         }
 
-        voteResults.innerHTML = resultsHTML || '<p style="text-align: center; color: #999;">No votes cast</p>';
-        finalWord.textContent = secretWord;
-        finalHint.textContent = hintWord;
+        if (Object.keys(votes).length === 0) {
+            resultsHTML = '<p style="text-align: center; color: #666;">No votes were cast!</p>';
+        }
 
+        voteResults.innerHTML = resultsHTML;
+
+        // Determine if players won or fakers won
         const fakerNames = fakerIndices.map(i => players[i]);
-        imposterList.innerHTML = fakerNames.map((name, idx) => {
-            const playerIndex = players.indexOf(name);
-            const colorClass = `player-color-${(playerIndex % 10) + 1}`;
-            return `<div class="vote-count ${colorClass}"><span>${name}</span></div>`;
-        }).join('');
+        let playersWon = false;
 
-        let caughtFakers = mostVoted.filter(name => fakerNames.includes(name));
-        
-        if (caughtFakers.length > 0 && mostVoted.length > 0) {
-            playerWins++;
-            winnerDisplay.innerHTML = `
-                <div class="winner">
-                    🎉 Players Win! 🎉<br>
-                    ${caughtFakers.join(', ')} caught!
-                </div>
-            `;
+        if (mostVoted.length > 0) {
+            // Check if any of the most voted are fakers
+            const votedOutFaker = mostVoted.some(name => fakerNames.includes(name));
+            
+            if (votedOutFaker && mostVoted.length === 1) {
+                playersWon = true;
+                playerWins++;
+                winnerDisplay.innerHTML = `
+                    <div class="winner">
+                        🎉 Players Win! 🎉<br>
+                        You correctly identified the imposter!
+                    </div>
+                `;
+            } else if (votedOutFaker && mostVoted.length > 1) {
+                winnerDisplay.innerHTML = `
+                    <div class="winner" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                        🤝 It's a Tie! 🤝<br>
+                        Multiple players tied with most votes
+                    </div>
+                `;
+            } else {
+                fakerWins++;
+                winnerDisplay.innerHTML = `
+                    <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                        😈 Imposters Win! 😈<br>
+                        The imposters fooled everyone!
+                    </div>
+                `;
+            }
         } else {
             fakerWins++;
             winnerDisplay.innerHTML = `
                 <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
                     😈 Imposters Win! 😈<br>
-                    ${fakerNames.join(', ')} fooled everyone!
+                    No one was voted out!
                 </div>
             `;
         }
 
-        const scoreBoard = document.getElementById('scores');
-        scoreBoard.innerHTML = `
-            <div class="vote-count" style="border-color: #28a745;">
-                <span>Players</span>
+        finalWord.textContent = secretWord;
+        finalHint.textContent = hintWord;
+
+        imposterList.innerHTML = fakerNames.map((name, idx) => {
+            const playerIndex = players.indexOf(name);
+            const color = getPlayerColor(playerIndex);
+            return `
+                <div class="vote-count" style="border-left-color: ${color};">
+                    <span>${name}</span>
+                    <span>🎭</span>
+                </div>
+            `;
+        }).join('');
+
+        // Display scoreboard
+        const scoresDiv = document.getElementById('scores');
+        scoresDiv.innerHTML = `
+            <div class="vote-count" style="border-left-color: #28a745;">
+                <span>👥 Players</span>
                 <span>${playerWins} win(s)</span>
             </div>
-            <div class="vote-count" style="border-color: #dc3545;">
-                <span>Imposters</span>
+            <div class="vote-count" style="border-left-color: #dc3545;">
+                <span>🎭 Imposters</span>
                 <span>${fakerWins} win(s)</span>
             </div>
         `;
 
+        // Update button text
+        const nextRoundBtn = document.getElementById('nextRoundBtn');
         if (currentRound >= totalRounds) {
-            document.getElementById('nextRoundBtn').style.display = 'none';
+            nextRoundBtn.textContent = 'Game Complete!';
+            nextRoundBtn.style.display = 'none';
         } else {
-            document.getElementById('nextRoundBtn').style.display = 'block';
+            nextRoundBtn.textContent = 'Next Round';
+            nextRoundBtn.style.display = 'block';
         }
 
         showScreen('results-screen');
     }
 
     function nextRound() {
+        if (currentRound >= totalRounds) {
+            return;
+        }
+
         currentRound++;
         
+        // Select new word
         const isMultiCategory = document.getElementById('multiCategoryToggle').checked;
         let categories = [];
 
@@ -654,6 +961,7 @@
         secretWord = selectedWord.word;
         hintWord = selectedWord.hint;
 
+        // Select new fakers
         const imposterCount = parseInt(document.getElementById('imposterCount').value);
         fakerIndices = [];
         while (fakerIndices.length < imposterCount) {
@@ -663,110 +971,34 @@
             }
         }
 
-        const startingPlayerValue = document.getElementById('startingPlayer').value;
-        if (startingPlayerValue === 'random') {
-            startingPlayerIndex = Math.floor(Math.random() * players.length);
-        }
+        // Randomize starting player for new round
+        startingPlayerIndex = Math.floor(Math.random() * players.length);
 
         currentPlayerIndex = 0;
-        playerVotes = {};
+        votes = {};
 
         updateRoundDisplays();
         showScreen('role-screen');
         showPlayerRole();
     }
 
-    function showScreen(screen) {
-        document.querySelectorAll('.setup-screen, .role-screen, .game-screen, .voting-screen, .results-screen').forEach(s => {
-            s.classList.remove('active');
-        });
-        document.querySelector('.' + screen).classList.add('active');
-    }
-
     function resetGame() {
-        currentPlayerIndex = 0;
-        fakerIndices = [];
-        secretWord = '';
-        hintWord = '';
-        playerVotes = {};
         currentRound = 1;
         playerWins = 0;
         fakerWins = 0;
-        showScreen('setup-screen');
-    }
-
-    document.getElementById('playerNameInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addPlayer();
-        }
-    });
-</script>
-```
-
-</body>
-</html>');
-            const winnerDisplay = document.getElementById('winnerDisplay');
-            const finalWord = document.getElementById('finalWord');
-            const finalHint = document.getElementById('finalHint');
-
-```
-        let resultsHTML = '';
-        let maxVotes = 0;
-        let accused = '';
-
-        for (let player in votes) {
-            resultsHTML += `
-                <div class="vote-count">
-                    <span>${player}</span>
-                    <span>${votes[player]} vote(s)</span>
-                </div>
-            `;
-            if (votes[player] > maxVotes) {
-                maxVotes = votes[player];
-                accused = player;
-            }
-        }
-
-        voteResults.innerHTML = resultsHTML;
-        finalWord.textContent = secretWord;
-        finalHint.textContent = hintWord;
-
-        const fakerName = players[fakerIndex];
-        if (accused === fakerName) {
-            winnerDisplay.innerHTML = `
-                <div class="winner">
-                    🎉 Players Win! 🎉<br>
-                    ${fakerName} was the faker and got caught!
-                </div>
-            `;
-        } else {
-            winnerDisplay.innerHTML = `
-                <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
-                    😈 Faker Wins! 😈<br>
-                    ${fakerName} fooled everyone!
-                </div>
-            `;
-        }
-
-        showScreen('results-screen');
-    }
-
-    function showScreen(screen) {
-        document.querySelectorAll('.setup-screen, .role-screen, .game-screen, .voting-screen, .results-screen').forEach(s => {
-            s.classList.remove('active');
-        });
-        document.querySelector('.' + screen).classList.add('active');
-    }
-
-    function resetGame() {
         currentPlayerIndex = 0;
-        fakerIndex = -1;
-        secretWord = '';
-        hintWord = '';
         votes = {};
         showScreen('setup-screen');
     }
 
+    function showScreen(screenName) {
+        document.querySelectorAll('.setup-screen, .role-screen, .game-screen, .voting-screen, .results-screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.querySelector(`.${screenName}`).classList.add('active');
+    }
+
+    // Allow Enter key to add player
     document.getElementById('playerNameInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             addPlayer();
