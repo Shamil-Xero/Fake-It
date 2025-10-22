@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake It - Party Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .setup-screen, .role-screen, .game-screen, .voting-screen, .results-screen {
+        display: none;
+    }
+
+    .setup-screen.active, .role-screen.active, .game-screen.active, .voting-screen.active, .results-screen.active {
+        display: block;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    .secondary-btn {
+        background: #6c757d;
+        margin-top: 10px;
+    }
+
+    .player-list {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .player-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: white;
+        margin-bottom: 8px;
+        border-radius: 6px;
+    }
+
+    .remove-btn {
+        background: #dc3545;
+        padding: 5px 15px;
+        width: auto;
+        font-size: 14px;
+    }
+
+    .role-reveal {
+        text-align: center;
+        padding: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .role-reveal h2 {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+
+    .secret-word {
+        font-size: 3em;
+        font-weight: bold;
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .hint-word {
+        font-size: 1.5em;
+        margin-top: 15px;
+        color: #ffd700;
+        font-style: italic;
+    }
+
+    .faker-reveal {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+
+    .hidden {
+        filter: blur(10px);
+        user-select: none;
+    }
+
+    .reveal-btn {
+        background: rgba(255,255,255,0.3);
+        margin-top: 20px;
+    }
+
+    .player-turn {
+        background: #e3f2fd;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .player-turn h3 {
+        color: #1976d2;
+        font-size: 1.5em;
+    }
+
+    .voting-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .vote-btn {
+        padding: 15px;
+        background: white;
+        border: 2px solid #667eea;
+        color: #667eea;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .vote-btn:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .vote-btn.selected {
+        background: #667eea;
+        color: white;
+    }
+
+    .results-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .results-box h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .vote-count {
+        padding: 10px;
+        background: white;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .winner {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+
+    .storage-info {
+        text-align: center;
+        color: #999;
+        font-size: 0.9em;
+        margin-top: 10px;
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Fake It</h1>
+        <p class="subtitle">Can you spot the faker?</p>
+
+```
+    <!-- Setup Screen -->
+    <div class="setup-screen active">
+        <div class="input-group">
+            <label>Add Player Name:</label>
+            <input type="text" id="playerNameInput" placeholder="Enter player name">
+            <button onclick="addPlayer()" style="margin-top: 10px;">Add Player</button>
+        </div>
+
+        <div class="player-list" id="playerList" style="display: none;">
+            <h3>Players:</h3>
+            <div id="players"></div>
+        </div>
+
+        <div class="input-group">
+            <label>Category:</label>
+            <select id="categorySelect">
+                <option value="animals">Animals</option>
+                <option value="food">Food & Drinks</option>
+                <option value="places">Places</option>
+                <option value="movies">Movies & TV</option>
+                <option value="objects">Everyday Objects</option>
+                <option value="sports">Sports</option>
+            </select>
+        </div>
+
+        <button onclick="startGame()">Start Game</button>
+        <p class="storage-info">✓ Player names are saved automatically</p>
+    </div>
+
+    <!-- Role Reveal Screen -->
+    <div class="role-screen">
+        <div class="role-reveal" id="roleReveal">
+            <h2 id="playerNameDisplay"></h2>
+            <div id="roleContent" class="hidden">
+                <p id="roleText"></p>
+                <div class="secret-word" id="secretWord"></div>
+                <div class="hint-word" id="hintWord"></div>
+            </div>
+            <button class="reveal-btn" onclick="revealRole()">👁️ Tap to See Your Role</button>
+        </div>
+        <button onclick="nextPlayer()">Next Player</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="game-screen">
+        <div class="player-turn">
+            <h3>Round <span id="roundNum">1</span></h3>
+            <p>Everyone takes turns giving a clue about the secret word!</p>
+        </div>
+        <button onclick="startVoting()">Start Voting</button>
+    </div>
+
+    <!-- Voting Screen -->
+    <div class="voting-screen">
+        <h2 style="text-align: center; margin-bottom: 20px;">Who is the Faker?</h2>
+        <p style="text-align: center; margin-bottom: 20px; color: #666;">Everyone votes for who they think is faking it!</p>
+        <div class="voting-grid" id="votingGrid"></div>
+        <button onclick="showResults()">Reveal Results</button>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="results-screen">
+        <div id="winnerDisplay"></div>
+        
+        <div class="results-box">
+            <h3>Vote Results:</h3>
+            <div id="voteResults"></div>
+        </div>
+
+        <div class="results-box">
+            <h3>The secret word was:</h3>
+            <div style="text-align: center; font-size: 2em; color: #667eea; font-weight: bold; margin-top: 10px;" id="finalWord"></div>
+            <div style="text-align: center; color: #666; margin-top: 10px;">Hint: <span id="finalHint"></span></div>
+        </div>
+
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    const words = {
+        animals: [
+            {word: 'Dog', hint: 'Pet'},
+            {word: 'Cat', hint: 'Pet'},
+            {word: 'Elephant', hint: 'Large animal'},
+            {word: 'Lion', hint: 'Wild cat'},
+            {word: 'Penguin', hint: 'Bird'},
+            {word: 'Dolphin', hint: 'Sea creature'},
+            {word: 'Tiger', hint: 'Wild cat'},
+            {word: 'Giraffe', hint: 'Tall animal'},
+            {word: 'Zebra', hint: 'Striped animal'},
+            {word: 'Koala', hint: 'Tree animal'}
+        ],
+        food: [
+            {word: 'Pizza', hint: 'Italian food'},
+            {word: 'Burger', hint: 'Fast food'},
+            {word: 'Sushi', hint: 'Japanese food'},
+            {word: 'Pasta', hint: 'Italian food'},
+            {word: 'Tacos', hint: 'Mexican food'},
+            {word: 'Ice Cream', hint: 'Frozen dessert'},
+            {word: 'Coffee', hint: 'Hot drink'},
+            {word: 'Chocolate', hint: 'Sweet treat'},
+            {word: 'Apple', hint: 'Fruit'},
+            {word: 'Sandwich', hint: 'Bread food'}
+        ],
+        places: [
+            {word: 'Beach', hint: 'Water location'},
+            {word: 'Mountain', hint: 'High place'},
+            {word: 'Library', hint: 'Quiet place'},
+            {word: 'Restaurant', hint: 'Eating place'},
+            {word: 'Park', hint: 'Outdoor space'},
+            {word: 'Museum', hint: 'Cultural place'},
+            {word: 'Cinema', hint: 'Entertainment venue'},
+            {word: 'Hospital', hint: 'Medical place'},
+            {word: 'School', hint: 'Learning place'},
+            {word: 'Airport', hint: 'Travel hub'}
+        ],
+        movies: [
+            {word: 'Star Wars', hint: 'Space franchise'},
+            {word: 'Harry Potter', hint: 'Magic series'},
+            {word: 'Marvel', hint: 'Superhero universe'},
+            {word: 'Disney', hint: 'Animation studio'},
+            {word: 'Titanic', hint: 'Ship movie'},
+            {word: 'Inception', hint: 'Dream movie'},
+            {word: 'Avatar', hint: 'Blue aliens'},
+            {word: 'Jurassic Park', hint: 'Dinosaur movie'}
+        ],
+        objects: [
+            {word: 'Phone', hint: 'Communication device'},
+            {word: 'Lamp', hint: 'Light source'},
+            {word: 'Chair', hint: 'Furniture'},
+            {word: 'Clock', hint: 'Time device'},
+            {word: 'Mirror', hint: 'Reflection'},
+            {word: 'Umbrella', hint: 'Rain tool'},
+            {word: 'Wallet', hint: 'Money holder'},
+            {word: 'Keys', hint: 'Door opener'},
+            {word: 'Pencil', hint: 'Writing tool'},
+            {word: 'Book', hint: 'Reading material'}
+        ],
+        sports: [
+            {word: 'Soccer', hint: 'Ball sport'},
+            {word: 'Basketball', hint: 'Hoop game'},
+            {word: 'Tennis', hint: 'Racket sport'},
+            {word: 'Swimming', hint: 'Water activity'},
+            {word: 'Baseball', hint: 'Bat sport'},
+            {word: 'Golf', hint: 'Club game'},
+            {word: 'Skiing', hint: 'Snow sport'},
+            {word: 'Boxing', hint: 'Fighting sport'},
+            {word: 'Cycling', hint: 'Bike activity'}
+        ]
+    };
+
+    let players = [];
+    let currentPlayerIndex = 0;
+    let fakerIndex = -1;
+    let secretWord = '';
+    let hintWord = '';
+    let votes = {};
+
+    // Load saved players on startup
+    window.addEventListener('DOMContentLoaded', loadPlayers);
+
+    function loadPlayers() {
+        const saved = localStorage.getItem('fakeItPlayers');
+        if (saved) {
+            try {
+                players = JSON.parse(saved);
+                updatePlayerList();
+            } catch (e) {
+                console.error('Error loading players:', e);
+            }
+        }
+    }
+
+    function savePlayers() {
+        try {
+            localStorage.setItem('fakeItPlayers', JSON.stringify(players));
+        } catch (e) {
+            console.error('Error saving players:', e);
+        }
+    }
+
+    function addPlayer() {
+        const input = document.getElementById('playerNameInput');
+        const name = input.value.trim();
+        
+        if (name && !players.includes(name)) {
+            players.push(name);
+            input.value = '';
+            savePlayers();
+            updatePlayerList();
+        }
+    }
+
+    function updatePlayerList() {
+        const list = document.getElementById('playerList');
+        const playersDiv = document.getElementById('players');
+        
+        if (players.length > 0) {
+            list.style.display = 'block';
+            playersDiv.innerHTML = players.map((p, i) => `
+                <div class="player-item">
+                    <span>${p}</span>
+                    <button class="remove-btn" onclick="removePlayer(${i})">Remove</button>
+                </div>
+            `).join('');
+        } else {
+            list.style.display = 'none';
+        }
+    }
+
+    function removePlayer(index) {
+        players.splice(index, 1);
+        savePlayers();
+        updatePlayerList();
+    }
+
+    function startGame() {
+        if (players.length < 3) {
+            alert('You need at least 3 players to play!');
+            return;
+        }
+
+        const category = document.getElementById('categorySelect').value;
+        const wordList = words[category];
+        const selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
+        secretWord = selectedWord.word;
+        hintWord = selectedWord.hint;
+        fakerIndex = Math.floor(Math.random() * players.length);
+        currentPlayerIndex = 0;
+
+        showScreen('role-screen');
+        showPlayerRole();
+    }
+
+    function showPlayerRole() {
+        const playerName = document.getElementById('playerNameDisplay');
+        const roleReveal = document.getElementById('roleReveal');
+        const roleContent = document.getElementById('roleContent');
+        const roleText = document.getElementById('roleText');
+        const secretWordDiv = document.getElementById('secretWord');
+        const hintWordDiv = document.getElementById('hintWord');
+        
+        playerName.textContent = players[currentPlayerIndex];
+        roleContent.classList.add('hidden');
+        
+        if (currentPlayerIndex === fakerIndex) {
+            roleReveal.classList.add('faker-reveal');
+            roleText.textContent = 'You are the FAKER!';
+            secretWordDiv.textContent = '❓';
+            hintWordDiv.textContent = `Hint: ${hintWord}`;
+            hintWordDiv.style.display = 'block';
+        } else {
+            roleReveal.classList.remove('faker-reveal');
+            roleText.textContent = 'The secret word is:';
+            secretWordDiv.textContent = secretWord;
+            hintWordDiv.style.display = 'none';
+        }
+
+        document.querySelector('.reveal-btn').style.display = 'block';
+    }
+
+    function revealRole() {
+        const roleContent = document.getElementById('roleContent');
+        roleContent.classList.remove('hidden');
+        document.querySelector('.reveal-btn').style.display = 'none';
+    }
+
+    function nextPlayer() {
+        currentPlayerIndex++;
+        
+        if (currentPlayerIndex < players.length) {
+            showPlayerRole();
+        } else {
+            showScreen('game-screen');
+        }
+    }
+
+    function startVoting() {
+        const grid = document.getElementById('votingGrid');
+        grid.innerHTML = players.map((p, i) => `
+            <button class="vote-btn" onclick="vote(${i})">${p}</button>
+        `).join('');
+        votes = {};
+        showScreen('voting-screen');
+    }
+
+    function vote(index) {
+        const buttons = document.querySelectorAll('.vote-btn');
+        buttons.forEach((btn, i) => {
+            if (i === index) {
+                btn.classList.add('selected');
+                votes[players[index]] = (votes[players[index]] || 0) + 1;
+            }
+        });
+    }
+
+    function showResults() {
+        const voteResults = document.getElementById('voteResults');
+        const winnerDisplay = document.getElementById('winnerDisplay');
+        const finalWord = document.getElementById('finalWord');
+        const finalHint = document.getElementById('finalHint');
+
+        let resultsHTML = '';
+        let maxVotes = 0;
+        let accused = '';
+
+        for (let player in votes) {
+            resultsHTML += `
+                <div class="vote-count">
+                    <span>${player}</span>
+                    <span>${votes[player]} vote(s)</span>
+                </div>
+            `;
+            if (votes[player] > maxVotes) {
+                maxVotes = votes[player];
+                accused = player;
+            }
+        }
+
+        voteResults.innerHTML = resultsHTML;
+        finalWord.textContent = secretWord;
+        finalHint.textContent = hintWord;
+
+        const fakerName = players[fakerIndex];
+        if (accused === fakerName) {
+            winnerDisplay.innerHTML = `
+                <div class="winner">
+                    🎉 Players Win! 🎉<br>
+                    ${fakerName} was the faker and got caught!
+                </div>
+            `;
+        } else {
+            winnerDisplay.innerHTML = `
+                <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                    😈 Faker Wins! 😈<br>
+                    ${fakerName} fooled everyone!
+                </div>
+            `;
+        }
+
+        showScreen('results-screen');
+    }
+
+    function showScreen(screen) {
+        document.querySelectorAll('.setup-screen, .role-screen, .game-screen, .voting-screen, .results-screen').forEach(s => {
+            s.classList.remove('active');
+        });
+        document.querySelector('.' + screen).classList.add('active');
+    }
+
+    function resetGame() {
+        currentPlayerIndex = 0;
+        fakerIndex = -1;
+        secretWord = '';
+        hintWord = '';
+        votes = {};
+        showScreen('setup-screen');
+    }
+
+    document.getElementById('playerNameInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addPlayer();
+        }
+    });
+</script>
+```
+
+</body>
+</html>
