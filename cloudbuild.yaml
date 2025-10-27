@@ -7,5 +7,5 @@ steps:
   - storage
   - cp
   - -r
-  - web-pages/*
+  - *
   - gs://fake-it-application
