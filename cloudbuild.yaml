@@ -1,0 +1,8 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - storage
+  - cp
+  - -r
+  - web-pages/*
+  - gs://fake-it-application
