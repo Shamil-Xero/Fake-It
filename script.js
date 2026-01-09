@@ -26,6 +26,9 @@ let playerWins = 0;
 let fakerWins = 0;
 let currentVotingPlayer = 0;
 let individualVotes = {};
+let playerScores = {}; // Track individual player scores
+let eliminatedPlayers = []; // Track eliminated players
+let gameEnded = false; // Track if game has ended
 
 window.addEventListener('DOMContentLoaded', function() {
     loadWords();
@@ -72,6 +75,87 @@ function assignRandomColorsToPlayers() {
 
 function getPlayerAssignedColor(playerName) {
     return playerColorAssignments[playerName] || '#667eea'; // Default color if not found
+}
+
+function initializePlayerScores() {
+    playerScores = {};
+    players.forEach(player => {
+        playerScores[player] = 0;
+    });
+}
+
+function addScoreToPlayer(playerName, points) {
+    if (playerScores[playerName] !== undefined) {
+        playerScores[playerName] += points;
+    }
+}
+
+function resetAllScores() {
+    initializePlayerScores();
+    updateScoreDisplay();
+}
+
+function getActivePlayers() {
+    return players.filter(player => !eliminatedPlayers.includes(player));
+}
+
+function getActiveImposters() {
+    return fakerIndices.filter(index => !eliminatedPlayers.includes(players[index]));
+}
+
+function checkGameEndConditions() {
+    const activePlayers = getActivePlayers();
+    const activeImposters = getActiveImposters();
+    
+    // Game ends if no imposters left (players win) or imposters equal or outnumber players
+    if (activeImposters.length === 0) {
+        return 'players_win';
+    } else if (activeImposters.length >= activePlayers.length) {
+        return 'imposters_win';
+    }
+    return 'continue';
+}
+
+function eliminatePlayer(playerName) {
+    if (!eliminatedPlayers.includes(playerName)) {
+        eliminatedPlayers.push(playerName);
+    }
+}
+
+function updateScoreDisplay() {
+    // This function can be called to update score display in real-time
+    // Currently used when resetting scores
+    const scoresDiv = document.getElementById('scores');
+    if (scoresDiv && Object.keys(playerScores).length > 0) {
+        let individualScoresHTML = '';
+        const sortedPlayers = Object.keys(playerScores).sort((a, b) => playerScores[b] - playerScores[a]);
+        
+        sortedPlayers.forEach(player => {
+            const playerColor = getPlayerAssignedColor(player);
+            const score = playerScores[player];
+            individualScoresHTML += `
+                <div class="vote-count" style="border-left-color: ${playerColor};">
+                    <span>${player}</span>
+                    <span>${score} points</span>
+                </div>
+            `;
+        });
+        
+        scoresDiv.innerHTML = `
+            <div class="vote-count" style="border-left-color: #28a745;">
+                <span>👥 Players</span>
+                <span>${playerWins} win(s)</span>
+            </div>
+            <div class="vote-count" style="border-left-color: #dc3545;">
+                <span>🎭 Imposters</span>
+                <span>${fakerWins} win(s)</span>
+            </div>
+            <div style="margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; color: #333;">Individual Scores:</h4>
+                ${individualScoresHTML}
+            </div>
+        `;
+    }
 }
 
 function adjustColorBrightness(color, amount) {
@@ -228,6 +312,13 @@ function startGame() {
 
     // Assign random colors to all players
     assignRandomColorsToPlayers();
+    
+    // Initialize player scores
+    initializePlayerScores();
+    
+    // Reset elimination tracking
+    eliminatedPlayers = [];
+    gameEnded = false;
 
     currentPlayerIndex = 0;
 
@@ -254,7 +345,8 @@ function showPlayerRole() {
     const secretWordDiv = document.getElementById('secretWord');
     const hintWordDiv = document.getElementById('hintWord');
     
-    const currentPlayer = players[currentPlayerIndex];
+    const activePlayers = getActivePlayers();
+    const currentPlayer = activePlayers[currentPlayerIndex];
     playerName.textContent = currentPlayer;
     
     // Apply player's assigned color to the card
@@ -266,12 +358,13 @@ function showPlayerRole() {
     roleContent.classList.add('hidden');
     
     // Set up the role content but keep it hidden
-    if (fakerIndices.includes(currentPlayerIndex)) {
+    const playerIndex = players.indexOf(currentPlayer);
+    if (fakerIndices.includes(playerIndex)) {
         roleReveal.classList.add('faker-reveal');
         roleText.textContent = 'You are an IMPOSTER!';
         secretWordDiv.textContent = '❓';
         // Show the specific hint assigned to this imposter
-        const imposterHint = imposterHints[currentPlayerIndex] || hintWord;
+        const imposterHint = imposterHints[playerIndex] || hintWord;
         hintWordDiv.textContent = `Hint: ${imposterHint}`;
         hintWordDiv.style.display = 'block';
     } else {
@@ -299,14 +392,16 @@ function revealRole() {
 }
 
 function nextPlayer() {
+    const activePlayers = getActivePlayers();
     currentPlayerIndex++;
     
-    if (currentPlayerIndex < players.length) {
+    if (currentPlayerIndex < activePlayers.length) {
         showPlayerRole();
     } else {
-        document.getElementById('startingPlayerName').textContent = players[startingPlayerIndex];
-        document.getElementById('imposterCountDisplay').textContent = fakerIndices.length;
-        document.getElementById('startPlayerReminder').textContent = players[startingPlayerIndex];
+        const activeImposters = getActiveImposters();
+        document.getElementById('startingPlayerName').textContent = activePlayers[startingPlayerIndex];
+        document.getElementById('imposterCountDisplay').textContent = activeImposters.length;
+        document.getElementById('startPlayerReminder').textContent = activePlayers[startingPlayerIndex];
         showScreen('game-screen');
     }
 }
@@ -319,7 +414,8 @@ function startVoting() {
 
 function showIndividualVoting() {
     const votingScreen = document.querySelector('.voting-screen');
-    const currentPlayer = players[currentVotingPlayer];
+    const activePlayers = getActivePlayers();
+    const currentPlayer = activePlayers[currentVotingPlayer];
     
     votingScreen.innerHTML = `
         <h2 style="text-align: center; margin-bottom: 20px;">${currentPlayer}'s Turn to Vote</h2>
@@ -330,9 +426,11 @@ function showIndividualVoting() {
     `;
     
     const grid = document.getElementById('votingGrid');
-    grid.innerHTML = players.map((p, i) => {
+    grid.innerHTML = activePlayers.map((p, i) => {
         const playerColor = getPlayerAssignedColor(p);
-        return `<button class="vote-btn" style="border-color: ${playerColor}; color: ${playerColor};" onclick="individualVote(${i})">${p}</button>`;
+        const isEliminated = eliminatedPlayers.includes(p);
+        const displayName = isEliminated ? `${p} (Eliminated)` : p;
+        return `<button class="vote-btn" style="border-color: ${playerColor}; color: ${playerColor}; ${isEliminated ? 'opacity: 0.5;' : ''}" onclick="individualVote(${i})" ${isEliminated ? 'disabled' : ''}>${displayName}</button>`;
     }).join('');
     
     showScreen('voting-screen');
@@ -341,8 +439,9 @@ function showIndividualVoting() {
 function individualVote(index) {
     const buttons = document.querySelectorAll('.vote-btn');
     const clickedButton = buttons[index];
-    const votedPlayer = players[index];
-    const currentPlayer = players[currentVotingPlayer];
+    const activePlayers = getActivePlayers();
+    const votedPlayer = activePlayers[index];
+    const currentPlayer = activePlayers[currentVotingPlayer];
     
     // Clear previous selection
     buttons.forEach(btn => btn.classList.remove('selected'));
@@ -357,7 +456,7 @@ function individualVote(index) {
     const nextVoterBtn = document.getElementById('nextVoterBtn');
     const showResultsBtn = document.getElementById('showResultsBtn');
     
-    if (currentVotingPlayer < players.length - 1) {
+    if (currentVotingPlayer < activePlayers.length - 1) {
         nextVoterBtn.style.display = 'block';
     } else {
         showResultsBtn.style.display = 'block';
@@ -426,45 +525,78 @@ function showResults() {
 
     voteResults.innerHTML = resultsHTML;
 
-    // Determine if players won or fakers won
-    const fakerNames = fakerIndices.map(i => players[i]);
-    let playersWon = false;
-
+    // Among Us style: Eliminate the most voted player
+    let eliminatedPlayer = null;
+    let eliminationMessage = '';
+    
     if (mostVoted.length > 0) {
-        // Check if any of the most voted are fakers
-        const votedOutFaker = mostVoted.some(name => fakerNames.includes(name));
-        
-        if (votedOutFaker && mostVoted.length === 1) {
-            playersWon = true;
-            playerWins++;
-            winnerDisplay.innerHTML = `
-                <div class="winner">
-                    🎉 Players Win! 🎉<br>
-                    You correctly identified the imposter!
-                </div>
-            `;
-        } else if (votedOutFaker && mostVoted.length > 1) {
-            winnerDisplay.innerHTML = `
-                <div class="winner" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
-                    🤝 It's a Tie! 🤝<br>
-                    Multiple players tied with most votes
-                </div>
-            `;
+        if (mostVoted.length === 1) {
+            // Single player with most votes - eliminate them
+            eliminatedPlayer = mostVoted[0];
+            eliminatePlayer(eliminatedPlayer);
+            eliminationMessage = `${eliminatedPlayer} was eliminated!`;
         } else {
-            fakerWins++;
-            winnerDisplay.innerHTML = `
-                <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
-                    😈 Imposters Win! 😈<br>
-                    The imposters fooled everyone!
-                </div>
-            `;
+            // Tie - no one is eliminated
+            eliminationMessage = `It's a tie! No one was eliminated.`;
         }
     } else {
+        eliminationMessage = `No votes were cast! No one was eliminated.`;
+    }
+
+    // Check game end conditions
+    const gameStatus = checkGameEndConditions();
+    
+    if (gameStatus === 'players_win') {
+        // All imposters eliminated - players win
+        playerWins++;
+        
+        // Award points to players who voted for imposters during the game
+        const fakerNames = fakerIndices.map(i => players[i]);
+        let correctVoters = [];
+        
+        for (let voter in individualVotes) {
+            if (fakerNames.includes(individualVotes[voter])) {
+                addScoreToPlayer(voter, 10);
+                correctVoters.push(voter);
+            }
+        }
+        
+        winnerDisplay.innerHTML = `
+            <div class="winner">
+                🎉 Players Win! 🎉<br>
+                All imposters have been eliminated!<br>
+                ${eliminationMessage}<br>
+                ${correctVoters.length > 0 ? `+10 points for correct votes: ${correctVoters.join(', ')}` : ''}
+            </div>
+        `;
+        gameEnded = true;
+    } else if (gameStatus === 'imposters_win') {
+        // Imposters outnumber or equal players - imposters win
         fakerWins++;
+        
+        // Award points to imposters
+        const activeImposters = getActiveImposters();
+        activeImposters.forEach(imposterIndex => {
+            const imposterName = players[imposterIndex];
+            addScoreToPlayer(imposterName, 15); // 15 points for imposter win
+        });
+        
         winnerDisplay.innerHTML = `
             <div class="winner" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
                 😈 Imposters Win! 😈<br>
-                No one was voted out!
+                Imposters have taken over!<br>
+                ${eliminationMessage}<br>
+                +15 points for surviving imposters: ${activeImposters.map(i => players[i]).join(', ')}
+            </div>
+        `;
+        gameEnded = true;
+    } else {
+        // Game continues
+        winnerDisplay.innerHTML = `
+            <div class="winner" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                🔄 Game Continues! 🔄<br>
+                ${eliminationMessage}<br>
+                Imposters still among us...
             </div>
         `;
     }
@@ -472,19 +604,43 @@ function showResults() {
     finalWord.textContent = secretWord;
     finalHint.textContent = hintWord;
 
-    // Show the imposter list box
-    imposterList.innerHTML = fakerNames.map((name, idx) => {
-        const playerColor = getPlayerAssignedColor(name);
-        return `
-            <div class="vote-count" style="border-left-color: ${playerColor};">
-                <span>${name}</span>
-                <span>🎭</span>
-            </div>
-        `;
-    }).join('');
+    // Show the imposter list box (only at game end)
+    if (gameEnded) {
+        const fakerNames = fakerIndices.map(i => players[i]);
+        imposterList.innerHTML = fakerNames.map((name, idx) => {
+            const playerColor = getPlayerAssignedColor(name);
+            const isEliminated = eliminatedPlayers.includes(name);
+            return `
+                <div class="vote-count" style="border-left-color: ${playerColor};">
+                    <span>${name} ${isEliminated ? '(Eliminated)' : '(Survived)'}</span>
+                    <span>🎭</span>
+                </div>
+            `;
+        }).join('');
+    } else {
+        imposterList.innerHTML = '<p style="text-align: center; color: #666;">Imposters remain hidden...</p>';
+    }
 
     // Display scoreboard
     const scoresDiv = document.getElementById('scores');
+    
+    // Create individual player scores display
+    let individualScoresHTML = '';
+    const sortedPlayers = Object.keys(playerScores).sort((a, b) => playerScores[b] - playerScores[a]);
+    
+    sortedPlayers.forEach(player => {
+        const playerColor = getPlayerAssignedColor(player);
+        const score = playerScores[player];
+        const isEliminated = eliminatedPlayers.includes(player);
+        const status = isEliminated ? ' (Eliminated)' : '';
+        individualScoresHTML += `
+            <div class="vote-count" style="border-left-color: ${playerColor}; ${isEliminated ? 'opacity: 0.6;' : ''}">
+                <span>${player}${status}</span>
+                <span>${score} points</span>
+            </div>
+        `;
+    });
+    
     scoresDiv.innerHTML = `
         <div class="vote-count" style="border-left-color: #28a745;">
             <span>👥 Players</span>
@@ -494,15 +650,19 @@ function showResults() {
             <span>🎭 Imposters</span>
             <span>${fakerWins} win(s)</span>
         </div>
+        <div style="margin-top: 15px;">
+            <h4 style="margin-bottom: 10px; color: #333;">Individual Scores:</h4>
+            ${individualScoresHTML}
+        </div>
     `;
 
-    // Update button text
+    // Update button text based on game status
     const nextRoundBtn = document.getElementById('nextRoundBtn');
-    if (currentRound >= totalRounds) {
+    if (gameEnded) {
         nextRoundBtn.textContent = 'Game Complete!';
         nextRoundBtn.style.display = 'none';
     } else {
-        nextRoundBtn.textContent = 'Next Round';
+        nextRoundBtn.textContent = 'Continue Game';
         nextRoundBtn.style.display = 'block';
     }
 
@@ -510,7 +670,7 @@ function showResults() {
 }
 
 function nextRound() {
-    if (currentRound >= totalRounds) {
+    if (gameEnded) {
         return;
     }
 
@@ -532,19 +692,10 @@ function nextRound() {
     const selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
     secretWord = selectedWord.word;
     
-    // Select new fakers
-    const imposterCount = parseInt(document.getElementById('imposterCount').value);
-    fakerIndices = [];
-    while (fakerIndices.length < imposterCount) {
-        const randomIndex = Math.floor(Math.random() * players.length);
-        if (!fakerIndices.includes(randomIndex)) {
-            fakerIndices.push(randomIndex);
-        }
-    }
-    
-    // Assign random hints to imposters
+    // Assign random hints to remaining imposters
     imposterHints = {};
-    fakerIndices.forEach(fakerIndex => {
+    const activeImposters = getActiveImposters();
+    activeImposters.forEach(fakerIndex => {
         const randomHint = selectedWord.hints[Math.floor(Math.random() * selectedWord.hints.length)];
         imposterHints[fakerIndex] = randomHint;
     });
@@ -552,11 +703,14 @@ function nextRound() {
     // For regular players, use the first hint
     hintWord = selectedWord.hints[0];
 
-    // Randomize starting player for new round
-    startingPlayerIndex = Math.floor(Math.random() * players.length);
+    // Randomize starting player for new round from active players
+    const activePlayers = getActivePlayers();
+    startingPlayerIndex = Math.floor(Math.random() * activePlayers.length);
 
     currentPlayerIndex = 0;
     votes = {};
+    individualVotes = {};
+    currentVotingPlayer = 0;
 
     updateRoundDisplays();
     showScreen('role-screen');
@@ -569,6 +723,7 @@ function resetGame() {
     fakerWins = 0;
     currentPlayerIndex = 0;
     votes = {};
+    // Don't reset scores when starting a new game, keep them persistent
     showScreen('setup-screen');
 }
 

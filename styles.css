@@ -234,6 +234,48 @@ button:active {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
+/* Reset score button styling */
+.reset-score-btn {
+    background: #ff6b6b !important;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.reset-score-btn:hover {
+    background: #ff5252 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.reset-score-btn:active {
+    transform: translateY(0);
+}
+
+/* Eliminated player styling */
+.eliminated-player {
+    opacity: 0.6;
+    text-decoration: line-through;
+    filter: grayscale(50%);
+}
+
+.vote-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+}
+
+.vote-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 .role-reveal h2 {
     font-size: 2em;
     margin-bottom: 20px;
@@ -258,7 +300,7 @@ button:active {
 }
 
 .hidden {
-    filter: blur(10px);
+    filter: blur(10000px);
     user-select: none;
 }
 
